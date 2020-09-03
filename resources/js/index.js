@@ -6,14 +6,36 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "@assets/sass/light-bootstrap-dashboard-pro-react.scss?v=1.2.0";
 import "@assets/css/demo.css";
 import "@assets/css/pe-icon-7-stroke.css";
+import LoginPage from "@pages/Auth/LoginPage";
+import { persistor, store } from "@store";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/lib/integration/react";
+import LoadingView from "@components/Loading/LoadingView";
+import Layout from "@layouts/Layout";
 
-import LoginPage from "@pages/Auth/LoginPage.jsx";
+const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
+  if (isLogin) {
+    return <Route {...rest} render={props => <Component {...props} />} />;
+  }
+  return <Redirect to="/login" />;
+};
 
 ReactDOM.render(
-    <BrowserRouter>
+  <Provider store={store}>
+    <PersistGate loading={<LoadingView />} persistor={persistor}>
+      <BrowserRouter>
         <Switch>
-            <Route path="/" exact render={props => <LoginPage {...props} />} />
+          <Route path="/login" render={props => <LoginPage {...props} />} />
+          <PrivateRoute
+            path="/admin"
+            component={Layout}
+            isLogin={localStorage.getItem("token")}
+          />
+          {/* <Route path="/admin" render={props => <AdminLayout {...props} />} /> */}
+          <Redirect from="/" to="/admin/dashboard" />
         </Switch>
-    </BrowserRouter>,
-    document.getElementById("root")
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>,
+  document.getElementById("root")
 );

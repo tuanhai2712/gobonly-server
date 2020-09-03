@@ -13,13 +13,20 @@ const mix = require("laravel-mix");
 
 mix.react("resources/js/index.js", "public/js");
 mix.webpackConfig({
-    resolve: {
-        alias: {
-            "@components": path.resolve(__dirname, "resources/js/components/"),
-            "@layouts": path.resolve(__dirname, "resources/js/layouts/"),
-            "@pages": path.resolve(__dirname, "resources/js/pages/"),
-            "@assets": path.resolve(__dirname, "resources/js/assets/"),
-            "@routes": path.resolve(__dirname, "resources/js/routes/")
-        }
+  resolve: {
+    alias: {
+      "@components": path.resolve(__dirname, "resources/js/components/"),
+      "@layouts": path.resolve(__dirname, "resources/js/layouts/"),
+      "@pages": path.resolve(__dirname, "resources/js/pages/"),
+      "@assets": path.resolve(__dirname, "resources/js/assets/"),
+      "@reducers": path.resolve(__dirname, "resources/js/reducers/"),
+      "@store": path.resolve(__dirname, "resources/js/store/"),
+      "@actions": path.resolve(__dirname, "resources/js/actions/"),
+      "@sagas": path.resolve(__dirname, "resources/js/sagas/"),
+      "@api": path.resolve(__dirname, "resources/js/api/"),
+      "@utils": path.resolve(__dirname, "resources/js/utils/"),
+      "@services": path.resolve(__dirname, "resources/js/services/"),
+      "@routes": path.resolve(__dirname, "resources/js/routes/")
     }
+  }
 });
