@@ -14,8 +14,9 @@ import LoadingView from "@components/Loading/LoadingView";
 import Layout from "@layouts/Layout";
 
 const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
+  console.log(rest);
   if (isLogin) {
-    return <Route {...rest} render={props => <Component {...props} />} />;
+    return <Route exact {...rest} render={props => <Component {...props} />} />;
   }
   return <Redirect to="/login" />;
 };
@@ -25,7 +26,11 @@ ReactDOM.render(
     <PersistGate loading={<LoadingView />} persistor={persistor}>
       <BrowserRouter>
         <Switch>
-          <Route path="/login" render={props => <LoginPage {...props} />} />
+          <Route
+            exact
+            path="/login"
+            render={props => <LoginPage {...props} />}
+          />
           <PrivateRoute
             path="/admin/dashboard"
             component={Layout}
