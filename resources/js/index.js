@@ -13,14 +13,6 @@ import { PersistGate } from "redux-persist/lib/integration/react";
 import LoadingView from "@components/Loading/LoadingView";
 import Layout from "@layouts/Layout";
 
-const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
-  console.log(rest);
-  if (isLogin) {
-    return <Route exact {...rest} render={props => <Component {...props} />} />;
-  }
-  return <Redirect to="/login" />;
-};
-
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={<LoadingView />} persistor={persistor}>
@@ -31,12 +23,17 @@ ReactDOM.render(
             path="/login"
             render={props => <LoginPage {...props} />}
           />
-          <PrivateRoute
+          <Route
+            exact
+            path="/admin/dashboard"
+            render={props => <Layout {...props} />}
+          />
+          {/* <PrivateRoute
             path="/admin/dashboard"
             component={Layout}
             isLogin={localStorage.getItem("token")}
           />
-          <Redirect from="/" to="/admin/dashboard" />
+          <Redirect from="/" to="/admin/dashboard" /> */}
         </Switch>
       </BrowserRouter>
     </PersistGate>
