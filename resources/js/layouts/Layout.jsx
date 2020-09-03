@@ -32,7 +32,7 @@ export default function Layout(props) {
           localStorage.clear();
           window.location.href = "/login";
         });
-    }, 18000000);
+    }, 180000);
 
     /** exit component then clear interval */
     return () => {

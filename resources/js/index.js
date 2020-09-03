@@ -27,11 +27,10 @@ ReactDOM.render(
         <Switch>
           <Route path="/login" render={props => <LoginPage {...props} />} />
           <PrivateRoute
-            path="/admin"
+            path="/admin/dashboard"
             component={Layout}
             isLogin={localStorage.getItem("token")}
           />
-          {/* <Route path="/admin" render={props => <AdminLayout {...props} />} /> */}
           <Redirect from="/" to="/admin/dashboard" />
         </Switch>
       </BrowserRouter>
