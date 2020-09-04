@@ -14,7 +14,6 @@ import LoadingView from "@components/Loading/LoadingView";
 import Layout from "@layouts/Layout";
 
 const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
-  console.log(rest);
   if (isLogin) {
     return <Route exact {...rest} render={props => <Component {...props} />} />;
   }
