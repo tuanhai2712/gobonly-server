@@ -23,6 +23,7 @@
       rel="stylesheet"
       type="text/css"
     />
+    <script src="/dist/avatar-image-cropper.min.js"></script>
 </head>
 <body>
     <div id="root"></div>

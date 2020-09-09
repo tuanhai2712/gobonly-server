@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "@assets/sass/light-bootstrap-dashboard-pro-react.scss?v=1.2.0";
 import "@assets/css/demo.css";
 import "@assets/css/pe-icon-7-stroke.css";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import LoginPage from "@pages/Auth/LoginPage";
 import { persistor, store } from "@store";
 import { Provider } from "react-redux";
@@ -32,6 +33,16 @@ ReactDOM.render(
           />
           <PrivateRoute
             path="/admin/dashboard"
+            component={Layout}
+            isLogin={localStorage.getItem("token")}
+          />
+          <PrivateRoute
+            path="/admin/create"
+            component={Layout}
+            isLogin={localStorage.getItem("token")}
+          />
+          <PrivateRoute
+            path="/admin/create-category"
             component={Layout}
             isLogin={localStorage.getItem("token")}
           />

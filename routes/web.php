@@ -24,6 +24,12 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/dashboard', function () {
         return view('welcome');
     });
+    Route::get('/create', function () {
+        return view('welcome');
+    });
+    Route::get('/create-category', function () {
+        return view('welcome');
+    });
 });
 
 

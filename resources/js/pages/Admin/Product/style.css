@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  /*
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  */
+}
