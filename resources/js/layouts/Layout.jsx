@@ -6,6 +6,7 @@ import { postJWT } from "../services/Api";
 export default function Layout(props) {
   useEffect(() => {
     // if (localStorage.getItem("token")) {
+    //   alert("token expired");
     //   getJWT("/auth/user-profile")
     //     .then(result => {
     //       if (result.status !== 200) {

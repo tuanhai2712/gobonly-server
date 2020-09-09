@@ -3,27 +3,25 @@ import { render } from "react-dom";
 import Draggable from "react-draggable";
 import "./style.css";
 import { range } from "ramda";
-import logo from "./logo.png";
+// import logo from "./logo.png";
 import tshirt from "./tshirt.png";
 import htmlToImage from "html-to-image";
-const size = 1000;
+import ImageUploader from "react-images-upload";
+const size = 500;
 
 export default function App() {
   const imgRef = useRef();
   const [image, setImg] = useState();
+  const [logo, setLogo] = useState();
   const [state, setState] = useState({
-    width: 250,
-    height: 250
+    width: 125,
+    height: 125
   });
   const test = () => {
     htmlToImage
       .toPng(imgRef.current)
       .then(function(dataUrl) {
-        // var img = new Image();
-        // img.src = dataUrl;
-        console.log(dataUrl);
         setImg(dataUrl);
-        // document.body.appendChild(img);
       })
       .catch(function(error) {
         console.error("oops, something went wrong!", error);
@@ -33,7 +31,11 @@ export default function App() {
     const { value, name } = event.target;
     setState({ ...state, [name]: parseInt(value) });
   };
-  console.log(state);
+
+  const onDrop = (file, pictureDataURLs) => {
+    setLogo(pictureDataURLs[0]);
+  };
+
   return (
     <>
       <input
@@ -49,11 +51,18 @@ export default function App() {
         onChange={e => handleInputChange(e)}
       />
       <button onClick={() => test()}>ok</button>
+      <ImageUploader
+        withIcon={true}
+        buttonText="Select template"
+        label={"Template for category"}
+        onChange={onDrop}
+        singleImage={true}
+        imgExtension={[".png"]}
+      />
       <img src={image} />
       <div ref={imgRef}>
         <div
           style={{
-            // transform: 'translate(-50%, -50%)',
             height: size,
             width: size,
             position: "relative",
@@ -71,8 +80,7 @@ export default function App() {
                 height: 250,
                 width: 250,
                 display: "flex",
-                flexWrap: "wrap",
-                background: "url(" + logo + ")"
+                flexWrap: "wrap"
               }}
             >
               <img

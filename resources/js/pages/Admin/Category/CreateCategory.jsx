@@ -11,8 +11,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { ActionTypes } from "@actions";
 import Card from "@components/Card/Card.jsx";
-import Checkbox from "@components/CustomCheckbox/CustomCheckbox.jsx";
 import Button from "@components/CustomButton/CustomButton.jsx";
+import Success from "@components/Alert/Success.jsx";
 import ImageUploader from "react-images-upload";
 import { SketchPicker } from "react-color";
 import { ColorCodeStyled, CreateCategoryStyled } from "./style";
@@ -59,6 +59,10 @@ export default function CreateCategory() {
   return (
     <div className="main-content">
       <CreateCategoryStyled>
+        <Success
+          successType={ActionTypes.CREATE_NEW_CATEGORY_SUCCESS}
+          mess="Create New Category Success"
+        />
         <Grid fluid>
           <Row>
             <Col md={6}>
