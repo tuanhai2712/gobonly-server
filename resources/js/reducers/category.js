@@ -3,15 +3,21 @@ import immutable from "immutability-helper";
 import { ActionTypes } from "@actions";
 
 export const categoryStateDefault = {
-  items: []
+  categories: {},
+  temps: {}
 };
 
 export default {
-  category: handleActions(
+  categories: handleActions(
     {
       [ActionTypes.GET_CATEGORY_LIST_SUCCESS]: (state, action) => {
         return immutable(state, {
-          items: { $set: action.payload }
+          categories: { $set: action.payload }
+        });
+      },
+      [ActionTypes.GET_CATEGORY_TEMP_SUCCESS]: (state, action) => {
+        return immutable(state, {
+          temps: { $set: action.payload }
         });
       }
     },

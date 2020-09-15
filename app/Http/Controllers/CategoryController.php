@@ -21,4 +21,9 @@ class CategoryController extends Controller
         $categoryList = $this->categoryService->get($request->all());
         return $categoryList;
     }
+
+    public function getTemp() {
+        $categoryTemp = $this->categoryService->getTemp();
+        return $categoryTemp;
+    }
 }

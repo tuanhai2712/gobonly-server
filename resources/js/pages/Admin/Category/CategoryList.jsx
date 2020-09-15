@@ -5,84 +5,103 @@ import {
   Col,
   Table,
   OverlayTrigger,
-  Tooltip,
-  Form,
-  FormGroup,
-  FormControl,
-  ControlLabel
+  Tooltip
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionTypes } from "@actions";
 import Card from "@components/Card/Card.jsx";
 import Button from "@components/CustomButton/CustomButton.jsx";
-import Success from "@components/Alert/Success.jsx";
-import ImageUploader from "react-images-upload";
-import { SketchPicker } from "react-color";
-import { CategoryListStyled } from "./style";
+import RegularPagination from "@components/Pagination/Pagination.jsx";
 import Select from "react-select";
-import { Formik } from "formik";
-import * as yup from "yup";
-import CreateMenuModal from "./CreateMenuModal";
 import moment from "moment";
 import Loader from "react-loader-spinner";
+import { isEmpty } from "lodash";
+import EditCategory from "./EditCategory";
+import { CategoryListStyled } from "./style";
 
-import img1 from "@assets/img/blog-1.jpg";
-import img2 from "@assets/img/blog-2.jpg";
-import img3 from "@assets/img/blog-3.jpg";
-import img4 from "@assets/img/blog-4.jpg";
-import img5 from "@assets/img/blog-5.jpg";
-
-export default function CreateCategory() {
-  const [state, setState] = useState({
-    template: null,
-    color_code: ""
-  });
+export default function CategoryList() {
   const [menuSelected, setMenuSelected] = useState(null);
-  const [genderSelected, setGenderSelected] = useState(null);
-  const [show, setShow] = useState(false);
   const fetching = useSelector(state => state.fetching);
-  const { items } = useSelector(state => state.category);
-  console.log(fetching);
-  console.log(items);
-  const { type, status } = fetching;
+  const { categories } = useSelector(state => state.categories);
+  const menu = useSelector(state => state.menu);
   const [conditions, setConditions] = useState({
-    category_name: "",
-    gender: "",
-    menu_name: ""
+    menu_id: "",
+    page: 1
+  });
+  const [showEdit, setShowEdit] = useState({
+    show: false,
+    item: {}
   });
   const dispatch = useDispatch();
-  const view = <Tooltip id="view">View Profile</Tooltip>;
-  const edit = <Tooltip id="edit">Edit Profile</Tooltip>;
-  const remove = <Tooltip id="remove">Remove</Tooltip>;
+  const editCategory = <Tooltip id="edit">Edit Category</Tooltip>;
+  const removeCategory = <Tooltip id="remove">Remove Category</Tooltip>;
 
   useEffect(() => {
     dispatch({
-      type: ActionTypes.GET_CATEGORY_LIST_REQUEST
+      type: ActionTypes.GET_MENU_REQUEST
+    });
+    dispatch({
+      type: ActionTypes.GET_CATEGORY_LIST_REQUEST,
+      conditions
     });
   }, []);
 
-  const actionsPost = () => {
+  const handleMenuSelect = menu => {
+    setMenuSelected(menu);
+    setConditions({ ...conditions, ["menu_id"]: menu.value });
+  };
+  const renderMenuList = () => {
+    let selectItems = [
+      {
+        value: 0,
+        label: "Menu Option",
+        isDisabled: true
+      }
+    ];
+    menu.items.map((item, idx) => {
+      selectItems.push({ value: item.id, label: item.name });
+    });
     return (
-      <td className="td-actions">
-        <OverlayTrigger placement="left" overlay={viewPost}>
-          <Button simple icon bsStyle="info">
-            <i className="fa fa-image" />
-          </Button>
-        </OverlayTrigger>
-        <OverlayTrigger placement="left" overlay={editPost}>
-          <Button simple icon bsStyle="success">
-            <i className="fa fa-edit" />
-          </Button>
-        </OverlayTrigger>
-        <OverlayTrigger placement="left" overlay={removePost}>
-          <Button simple icon bsStyle="danger">
-            <i className="fa fa-times" />
-          </Button>
-        </OverlayTrigger>
-      </td>
+      <Select
+        className="react-select primary"
+        classNamePrefix="react-select"
+        value={menuSelected}
+        onChange={value => handleMenuSelect(value)}
+        options={selectItems}
+      />
     );
   };
 
+  const handleChangePage = currentPage => {
+    setConditions({ ...conditions, ["page"]: currentPage });
+    dispatch({
+      type: ActionTypes.GET_CATEGORY_LIST_REQUEST,
+      conditions: {
+        menu_id: conditions.menu_id,
+        page: currentPage
+      }
+    });
+  };
+  const search = () => {
+    dispatch({
+      type: ActionTypes.GET_CATEGORY_LIST_REQUEST,
+      conditions
+    });
+  };
+
+  const edit = item => {
+    setShowEdit({
+      status: true,
+      item
+    });
+  };
+
+  const back = () => {
+    setShowEdit({
+      status: false,
+      item: {}
+    });
+  };
   const renderContent = () => {
     const { type, status } = fetching;
     if (type === ActionTypes.GET_CATEGORY_LIST_REQUEST && status) {
@@ -92,12 +111,15 @@ export default function CreateCategory() {
         </div>
       );
     }
-    if (!items.length) {
+    if (isEmpty(categories)) {
       return (
         <div style={{ textAlign: "center" }}>
           <span>No record found</span>
         </div>
       );
+    }
+    if (showEdit.status) {
+      return <EditCategory item={showEdit.item} back={() => back()} />;
     }
     return (
       <CategoryListStyled>
@@ -109,14 +131,13 @@ export default function CreateCategory() {
               <th>Gender</th>
               <th>Menu</th>
               <th>Created At</th>
-              <th>Views</th>
               <th />
             </tr>
           </thead>
           <tbody>
-            {items.map((item, key) => {
+            {categories.data.map((item, key) => {
               return (
-                <tr>
+                <tr key={key}>
                   <td className="td-template">
                     <div className="img-container">
                       <img
@@ -130,17 +151,42 @@ export default function CreateCategory() {
                   <td className="td-gender">{item.gender}</td>
                   <td className="td-menu">{item.menu.name}</td>
                   <td className="td-created_at">
-                    {moment(item.created_at).format("hh:mm:ss DD/MM/YYY")}
+                    {moment(item.created_at).format("hh:mm:ss DD/MM/YYYY")}
                   </td>
-                  {actionsPost}
+                  <td>
+                    <OverlayTrigger placement="left" overlay={editCategory}>
+                      <Button
+                        simple
+                        icon
+                        bsStyle="success"
+                        onClick={() => edit(item)}
+                      >
+                        <i className="fa fa-edit" />
+                      </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger placement="left" overlay={removeCategory}>
+                      <Button simple icon bsStyle="danger">
+                        <i className="fa fa-times" />
+                      </Button>
+                    </OverlayTrigger>
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </Table>
+        <div className="content" style={{ textAlign: "end" }}>
+          <RegularPagination
+            totalItems={categories.total}
+            pageSize={10}
+            handleChangePage={page => handleChangePage(page)}
+            currentPage={conditions.page}
+          />
+        </div>
       </CategoryListStyled>
     );
   };
+
   return (
     <div className="main-content">
       <Grid fluid>
@@ -148,7 +194,22 @@ export default function CreateCategory() {
           <Col md={12}>
             <Card
               textCenter
-              title="Table Big Boy"
+              title="Filter Conditions"
+              tableFullWidth
+              content={
+                <div>
+                  <Col md={3}>{renderMenuList()}</Col>
+                  <Button onClick={() => search()}>Search</Button>
+                </div>
+              }
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <Card
+              textCenter
+              title="Category List"
               category="A table for content management"
               tableFullWidth
               content={renderContent()}

@@ -3,14 +3,14 @@ import auth from "./auth";
 import fetching from "./fetching";
 import error from "./error";
 import menu from "./menu";
-import category from "./category";
+import categories from "./category";
 
 const allReducer = combineReducers({
   ...auth,
   ...fetching,
   ...error,
   ...menu,
-  ...category
+  ...categories
 });
 
 export default allReducer;

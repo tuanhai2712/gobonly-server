@@ -13,9 +13,10 @@ Route::group(['middleware' => 'api'], function () {
 
     });
     Route::group(['middleware' => 'auth'], function () {
+        Route::post('create-category', 'CategoryController@create');
+        Route::post('create-menu', 'MenuController@create');
+        Route::get('menu-list', 'MenuController@get');
+        Route::post('category-list', 'CategoryController@get');
+        Route::get('get-category-temp', 'CategoryController@getTemp');
     });
-    Route::post('create-category', 'CategoryController@create');
-    Route::post('create-menu', 'MenuController@create');
-    Route::get('menu-list', 'MenuController@get');
-    Route::post('category-list', 'CategoryController@get');
 });

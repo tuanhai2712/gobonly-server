@@ -22,6 +22,10 @@ export default keyMirror({
   GET_CATEGORY_LIST_SUCCESS: undefined,
   GET_CATEGORY_LIST_FAILURE: undefined,
 
+  GET_CATEGORY_TEMP_REQUEST: undefined,
+  GET_CATEGORY_TEMP_SUCCESS: undefined,
+  GET_CATEGORY_TEMP_FAILURE: undefined,
+
   // Menu
   CREATE_NEW_MENU_REQUEST: undefined,
   CREATE_NEW_MENU_SUCCESS: undefined,

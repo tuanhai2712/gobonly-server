@@ -68,13 +68,20 @@ class CategoryService implements CategoryServiceInterface
         $category = $category->where('menu_id', $conditions['menu_id']);
       }
 
-      $category = $category->get()->toArray();
-
+      $category = $category->paginate(10, ['*'], 'page', $conditions['page'])->toArray();
       return response()->json([
-        'data' => $category,
+        'data' => $category['data'],
+        'total' => $category['total'],
+        'currentPage' => $category['current_page'],
         'message' => 'Create new category successfull',
       ], 200);
     }
 
-    // 
+    public function getTemp()
+    {
+      $categoryTemp = Category::with('template')->get()->toArray();
+      return response()->json([
+        'data' => $categoryTemp,
+      ], 200);
+    }
 }

@@ -3,7 +3,6 @@ import { ActionTypes } from "@actions";
 import { postJWT, getJWT } from "@services/Api";
 
 export function* createNewCategory({ payload }) {
-  console.log(payload);
   try {
     let formData = new FormData();
     formData.append("template", payload.template);
@@ -12,8 +11,7 @@ export function* createNewCategory({ payload }) {
     formData.append("description", payload.description);
     formData.append("gender", payload.gender);
     formData.append("menu_id", payload.menu_id);
-    let response = yield postJWT("/create-category", formData);
-    console.log(response);
+    yield postJWT("/create-category", formData);
     yield put({
       type: ActionTypes.CREATE_NEW_CATEGORY_SUCCESS
     });
@@ -25,12 +23,12 @@ export function* createNewCategory({ payload }) {
   }
 }
 
-export function* getCategoryList() {
+export function* getCategoryList({ conditions }) {
   try {
-    let response = yield getJWT("/category-list");
+    let response = yield postJWT("/category-list", conditions);
     yield put({
       type: ActionTypes.GET_CATEGORY_LIST_SUCCESS,
-      payload: response.data.data
+      payload: response.data
     });
   } catch (err) {
     yield put({
@@ -39,10 +37,25 @@ export function* getCategoryList() {
     });
   }
 }
+export function* getCategoryTemp() {
+  try {
+    let response = yield getJWT("/get-category-temp");
+    yield put({
+      type: ActionTypes.GET_CATEGORY_TEMP_SUCCESS,
+      payload: response.data
+    });
+  } catch (err) {
+    yield put({
+      type: ActionTypes.GET_CATEGORY_TEMP_FAILURE,
+      payload: err.response
+    });
+  }
+}
 
 export default function* root() {
   yield all([
     takeLatest(ActionTypes.CREATE_NEW_CATEGORY_REQUEST, createNewCategory),
-    takeLatest(ActionTypes.GET_CATEGORY_LIST_REQUEST, getCategoryList)
+    takeLatest(ActionTypes.GET_CATEGORY_LIST_REQUEST, getCategoryList),
+    takeLatest(ActionTypes.GET_CATEGORY_TEMP_REQUEST, getCategoryTemp)
   ]);
 }

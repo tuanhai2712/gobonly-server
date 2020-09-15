@@ -22,8 +22,12 @@
       rel="stylesheet"
       type="text/css"
     />
+    <link rel="stylesheet" href="https://unpkg.com/react-rangeslider/umd/rangeslider.min.css" />
 </head>
 <body>
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script src="https://unpkg.com/react-rangeslider/umd/rangeslider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.js"></script>
     <div id="root"></div>
     <script src="{{asset('js/index.js')}}"></script>
 </body>
