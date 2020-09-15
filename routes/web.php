@@ -24,10 +24,13 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/dashboard', function () {
         return view('welcome');
     });
-    Route::get('/create', function () {
+    Route::get('/product-create', function () {
         return view('welcome');
     });
-    Route::get('/create-category', function () {
+    Route::get('/category-create', function () {
+        return view('welcome');
+    });
+    Route::get('/category-list', function () {
         return view('welcome');
     });
 });

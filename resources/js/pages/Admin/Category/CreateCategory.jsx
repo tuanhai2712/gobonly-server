@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Row,
@@ -15,12 +15,16 @@ import Button from "@components/CustomButton/CustomButton.jsx";
 import Success from "@components/Alert/Success.jsx";
 import ImageUploader from "react-images-upload";
 import { SketchPicker } from "react-color";
-import { ColorCodeStyled, CreateCategoryStyled } from "./style";
+import {
+  ColorCodeStyled,
+  CreateCategoryStyled,
+  SelectMenuStyled
+} from "./style";
 import Loader from "react-loader-spinner";
-
+import Select from "react-select";
 import { Formik } from "formik";
 import * as yup from "yup";
-
+import CreateMenuModal from "./CreateMenuModal";
 const schema = yup.object({
   name: yup.string().required("Please enter category name"),
   description: yup
@@ -34,9 +38,19 @@ export default function CreateCategory() {
     template: null,
     color_code: ""
   });
+  const [menuSelected, setMenuSelected] = useState(null);
+  const [genderSelected, setGenderSelected] = useState(null);
+  const [show, setShow] = useState(false);
   const fetching = useSelector(state => state.fetching);
+  const { items } = useSelector(state => state.menu);
   const { type, status } = fetching;
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch({
+      type: ActionTypes.GET_MENU_REQUEST
+    });
+  }, []);
   const onDrop = file => {
     setState({ ...state, ["template"]: file.length ? file[0] : null });
   };
@@ -46,16 +60,42 @@ export default function CreateCategory() {
   };
 
   const create = (values, { setSubmitting }) => {
-    if (!state.template || !state.color_code) {
+    if (!state.template || !state.color_code || !menuSelected) {
       return;
     }
     dispatch({
       type: ActionTypes.CREATE_NEW_CATEGORY_REQUEST,
-      payload: { ...values, ...state }
+      payload: {
+        ...values,
+        ...state,
+        menu_id: menuSelected.value,
+        gender: genderSelected.label
+      }
     });
     setSubmitting(false);
   };
 
+  const renderMenuList = () => {
+    let selectItems = [
+      {
+        value: 0,
+        label: "Menu Option",
+        isDisabled: true
+      }
+    ];
+    items.map((item, idx) => {
+      selectItems.push({ value: item.id, label: item.name });
+    });
+    return (
+      <Select
+        className="react-select primary"
+        classNamePrefix="react-select"
+        value={menuSelected}
+        onChange={value => setMenuSelected(value)}
+        options={selectItems}
+      />
+    );
+  };
   return (
     <div className="main-content">
       <CreateCategoryStyled>
@@ -63,6 +103,7 @@ export default function CreateCategory() {
           successType={ActionTypes.CREATE_NEW_CATEGORY_SUCCESS}
           mess="Create New Category Success"
         />
+        {show && <CreateMenuModal show={show} close={() => setShow(status)} />}
         <Grid fluid>
           <Row>
             <Col md={6}>
@@ -73,7 +114,8 @@ export default function CreateCategory() {
                     validationSchema={schema}
                     initialValues={{
                       name: "",
-                      description: ""
+                      description: "",
+                      menu_id: null
                     }}
                     onSubmit={create}
                   >
@@ -89,6 +131,35 @@ export default function CreateCategory() {
                         <Form noValidate onSubmit={handleSubmit}>
                           <FormGroup>
                             <ControlLabel>
+                              Menu: <span className="star">*</span>
+                            </ControlLabel>
+                            <SelectMenuStyled>
+                              {type === ActionTypes.GET_MENU_REQUEST ? (
+                                <Loader
+                                  type="Circles"
+                                  color="#36d7b7"
+                                  height={25}
+                                  width={25}
+                                />
+                              ) : (
+                                renderMenuList()
+                              )}
+                              <Button
+                                className="add-menu-btn"
+                                onClick={() => setShow(true)}
+                              >
+                                <i className="pe-7s-plus"></i>
+                              </Button>
+                            </SelectMenuStyled>
+                            {!menuSelected && (
+                              <small className="text-danger">
+                                Please select menu first
+                              </small>
+                            )}
+                          </FormGroup>
+
+                          <FormGroup>
+                            <ControlLabel>
                               Category Name: <span className="star">*</span>
                             </ControlLabel>
                             <FormControl
@@ -102,6 +173,27 @@ export default function CreateCategory() {
                                 {errors.name}
                               </small>
                             )}
+                          </FormGroup>
+                          <FormGroup>
+                            <ControlLabel>
+                              Gender: <span className="star">*</span>
+                            </ControlLabel>
+                            <Select
+                              className="react-select primary"
+                              classNamePrefix="react-select"
+                              value={genderSelected}
+                              onChange={value => setGenderSelected(value)}
+                              options={[
+                                {
+                                  value: 0,
+                                  label: "Gender Option",
+                                  isDisabled: true
+                                },
+                                { value: 1, label: "Male" },
+                                { value: 2, label: "Female" },
+                                { value: 3, label: "All" }
+                              ]}
+                            />
                           </FormGroup>
                           <FormGroup controlId="formControlsTextarea">
                             <ControlLabel>

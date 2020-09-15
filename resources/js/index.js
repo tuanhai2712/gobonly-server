@@ -13,7 +13,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/lib/integration/react";
 import LoadingView from "@components/Loading/LoadingView";
 import Layout from "@layouts/Layout";
-
+import Error from "@components/Alert/Error.jsx";
 const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
   if (isLogin) {
     return <Route exact {...rest} render={props => <Component {...props} />} />;
@@ -24,6 +24,7 @@ const PrivateRoute = ({ isLogin, component: Component, ...rest }) => {
 ReactDOM.render(
   <Provider store={store}>
     <PersistGate loading={<LoadingView />} persistor={persistor}>
+      <Error />
       <BrowserRouter>
         <Switch>
           <Route
@@ -37,12 +38,17 @@ ReactDOM.render(
             isLogin={localStorage.getItem("token")}
           />
           <PrivateRoute
-            path="/admin/create"
+            path="/admin/product-create"
             component={Layout}
             isLogin={localStorage.getItem("token")}
           />
           <PrivateRoute
-            path="/admin/create-category"
+            path="/admin/category-create"
+            component={Layout}
+            isLogin={localStorage.getItem("token")}
+          />
+          <PrivateRoute
+            path="/admin/category-list"
             component={Layout}
             isLogin={localStorage.getItem("token")}
           />

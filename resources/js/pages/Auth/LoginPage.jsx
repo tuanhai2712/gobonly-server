@@ -18,6 +18,7 @@ import bgImage from "@assets/img/full-screen-image-3.jpg";
 // library
 import { Formik } from "formik";
 import * as yup from "yup";
+import Loader from "react-loader-spinner";
 // style
 import { LoginPageStyled } from "./style";
 import { ActionTypes } from "@actions";
@@ -36,7 +37,8 @@ const schema = yup.object({
 function LoginPage() {
   const [cardHidden, setCardHidden] = useState(true);
   const dispatch = useDispatch();
-  const auth = useSelector(state => state.auth);
+  const fetching = useSelector(state => state.fetching);
+  const { type, status } = fetching;
   useEffect(() => {
     setTimeout(() => setCardHidden(false), 700);
   }, []);
@@ -92,7 +94,9 @@ function LoginPage() {
                                   onChange={handleChange}
                                 />
                                 {errors.email && touched.email && (
-                                  <span>{errors.email}</span>
+                                  <small className="text-danger">
+                                    {errors.email}
+                                  </small>
                                 )}
                               </FormGroup>
                               <FormGroup>
@@ -106,7 +110,9 @@ function LoginPage() {
                                   onChange={handleChange}
                                 />
                                 {errors.password && touched.password && (
-                                  <span>{errors.password}</span>
+                                  <small className="text-danger">
+                                    {errors.password}
+                                  </small>
                                 )}
                               </FormGroup>
                               <Button
@@ -115,7 +121,17 @@ function LoginPage() {
                                 disabled={isSubmitting}
                                 className="login-btn"
                               >
-                                Login
+                                {type === ActionTypes.USER_LOGIN_REQUEST &&
+                                status ? (
+                                  <Loader
+                                    type="Circles"
+                                    color="#36d7b7"
+                                    height={25}
+                                    width={25}
+                                  />
+                                ) : (
+                                  "Login"
+                                )}
                               </Button>
                             </Form>
                           );

@@ -17,6 +17,7 @@
 import Dashboard from "@pages/Admin/Dashboard/Dashboard.jsx";
 import CreateProduct from "@pages/Admin/Product/CreateProduct.jsx";
 import CreateCategory from "@pages/Admin/Category/CreateCategory.jsx";
+import CategoryList from "@pages/Admin/Category/CategoryList.jsx";
 
 var routes = [
   {
@@ -34,7 +35,7 @@ var routes = [
     icon: "pe-7s-photo-gallery",
     views: [
       {
-        path: "/create",
+        path: "/product-create",
         layout: "/admin",
         name: "Create",
         mini: "C",
@@ -50,11 +51,18 @@ var routes = [
     icon: "pe-7s-plugin",
     views: [
       {
-        path: "/create-category",
+        path: "/category-create",
         layout: "/admin",
         name: "Create Category",
         mini: "CC",
         component: CreateCategory
+      },
+      {
+        path: "/category-list",
+        layout: "/admin",
+        name: "Category List",
+        mini: "CL",
+        component: CategoryList
       }
     ]
   }

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin</title>
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
     <link
       rel="apple-touch-icon"
@@ -23,7 +22,6 @@
       rel="stylesheet"
       type="text/css"
     />
-    <script src="/dist/avatar-image-cropper.min.js"></script>
 </head>
 <body>
     <div id="root"></div>

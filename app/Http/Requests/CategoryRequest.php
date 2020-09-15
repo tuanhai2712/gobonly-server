@@ -27,6 +27,8 @@ class CategoryRequest extends FormRequest
             'name' => 'required',
             'description' => 'required|max:1000',
             'color_code' => 'required',
+            'gender' => 'required',
+            'menu_id' => 'required',
         ];
     }
 }

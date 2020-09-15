@@ -24,3 +24,28 @@ export const ColorCodeStyled = styled.div`
   font-weight: bold;
   margin-bottom: 10px;
 `;
+
+export const SelectMenuStyled = styled.div`
+  display: flex;
+  .react-select {
+    flex: 1;
+  }
+  .add-menu-btn {
+    padding: 0px;
+    border: unset;
+    margin-left: 5px;
+    align-items: center;
+    display: flex;
+    .pe-7s-plus:before {
+      font-size: 27px;
+    }
+  }
+`;
+
+export const CategoryListStyled = styled.div`
+  .img-container {
+  }
+  .img-template {
+    width: 120px !important;
+  }
+`;

@@ -14,9 +14,12 @@ class CreateTemplateTable extends Migration
     public function up()
     {
         Schema::create('template', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('url');
-            $table->integer('category_id');
+            $table->string('color');
+            $table->unsignedInteger('category_id');
+            $table->foreign('category_id')->references('id')->on('category')
+            ->onDelete('cascade');
             $table->timestamps();
         });
     }

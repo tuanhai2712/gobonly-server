@@ -2,14 +2,13 @@
 namespace App\Services;
 
 use App\Interfaces\CategoryServiceInterface;
-use Illuminate\Support\Facades\Log;
 use App\EloquentModels\Category;
 use App\EloquentModels\Template;
 use App\EloquentModels\Color;
 use App\EloquentModels\CategoryColor;
 use App\EloquentModels\CategorySize;
 use App\EloquentModels\Size;
-use Illuminate\Support\Facades\DB;
+use App\EloquentModels\Menu;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryService implements CategoryServiceInterface
@@ -18,24 +17,23 @@ class CategoryService implements CategoryServiceInterface
     {
       $hasCategory = Category::where('name', $data['name'])->first();
       if ($hasCategory) {
-        return [
-          'mess' => 'Category has exist',
-          'status' => 422
-        ];
+        return response()->json([
+          'message' => 'Category has exist',
+        ], 422);
       }
       $newCategory = new Category;
       $newCategory->name = $data['name'];
       $newCategory->description = $data['description'];
+      $newCategory->gender = $data['gender'];
+      $newCategory->menu_id = $data['menu_id'];
       $newCategory->save();
       if ($newCategory->id) {
-        $this->saveImage($data['template'], $newCategory->id);
-        $this->saveColorCategory($data['color_code'], $newCategory->id);
+        $this->saveTemplate($data['template'], $newCategory->id, $data['color_code']);
         $this->saveSizeCategory($newCategory->id);
       }
-      return [
-        'mess' => 'Create new category successfull',
-        'status' => 200
-      ];
+      return response()->json([
+        'message' => 'Create new category successfull',
+      ], 200);
     }
 
     private function saveSizeCategory($categoryId)
@@ -50,32 +48,33 @@ class CategoryService implements CategoryServiceInterface
       }
       CategorySize::insert($data);
     }
-    private function saveColorCategory($color, $categoryId)
-    {
-      $colorId = null;
-      $hasColor = Color::where('color_code', $color)->first();
-      if (!$hasColor) {
-        $newColor = new Color;
-        $newColor->color_code = $color;
-        $newColor->save();
-        $colorId= $newColor->id;
-      } else {
-        $colorId = $hasColor->id;
-      }
-      $newCategoryColor = new CategoryColor;
-      $newCategoryColor->category_id = $categoryId;
-      $newCategoryColor->color_id = $colorId;
-      $newCategoryColor->save();
-    }
-
-    private function saveImage($file, $categoryId)
+  
+    private function saveTemplate($file, $categoryId, $color)
     {
         $file = Storage::disk('public')->put('', $file);
         $url = Storage::url($file);
         $newTemplate = new Template;
         $newTemplate->url = $url;
+        $newTemplate->color = $color;
         $newTemplate->category_id = $categoryId;
         $newTemplate->save();
     }
 
+    public function get($conditions)
+    {
+      $category = Category::with('size')->with('template')->with('menu');
+
+      if (isset($conditions['menu_id'])) {
+        $category = $category->where('menu_id', $conditions['menu_id']);
+      }
+
+      $category = $category->get()->toArray();
+
+      return response()->json([
+        'data' => $category,
+        'message' => 'Create new category successfull',
+      ], 200);
+    }
+
+    // 
 }

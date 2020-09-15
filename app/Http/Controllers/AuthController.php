@@ -35,7 +35,7 @@ class AuthController extends Controller {
             return response()->json($validator->errors(), 422);
         }
         if (!$token = JWTAuth::attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         return $this->createNewToken($token);

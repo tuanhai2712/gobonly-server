@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Interfaces\CategoryServiceInterface;
 use App\Services\CategoryService;
+use App\Interfaces\MenuServiceInterface;
+use App\Services\MenuService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(
             CategoryServiceInterface::class,
             CategoryService::class
+        );
+        $this->app->singleton(
+            MenuServiceInterface::class,
+            MenuService::class
         );
     }
 

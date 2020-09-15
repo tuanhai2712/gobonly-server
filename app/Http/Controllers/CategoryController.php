@@ -17,4 +17,8 @@ class CategoryController extends Controller
         $createCategory = $this->categoryService->create($request->all());
         return $createCategory;
     }
+    public function get(Request $request) {
+        $categoryList = $this->categoryService->get($request->all());
+        return $categoryList;
+    }
 }

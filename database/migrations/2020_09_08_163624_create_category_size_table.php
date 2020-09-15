@@ -14,8 +14,13 @@ class CreateCategorySizeTable extends Migration
     public function up()
     {
         Schema::create('category_size', function (Blueprint $table) {
-            $table->integer('category_id');
-            $table->integer('size_id');
+            $table->increments('id');
+            $table->unsignedInteger('category_id');
+            $table->unsignedInteger('size_id');
+            $table->foreign('category_id')->references('id')->on('category')
+            ->onDelete('cascade');
+            $table->foreign('size_id')->references('id')->on('size')
+            ->onDelete('cascade');
             $table->timestamps();
         });
     }
