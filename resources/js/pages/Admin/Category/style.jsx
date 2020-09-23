@@ -10,19 +10,46 @@ export const CreateCategoryStyled = styled.div`
     margin-top: 0px;
     margin-bottom: 10px;
   }
+  .add-template-container {
+    display: flex;
+    padding: 10px;
+    border: 1px solid #a69a9a;
+    margin-bottom: 10px;
+    background-color: #d3c9c9;
+  }
+  .btn-add-temp {
+    margin-left: 15px;
+    margin-bottom: 20px;
+  }
+  .btn-upload-template {
+    display: flex;
+    flex-direction: column;
+    > button {
+      width: 70px;
+      height: 70px;
+      margin-right: 10px;
+      background-size: cover;
+      > i {
+        font-size: 30px;
+      }
+    }
+  }
 `;
 
 export const ColorCodeStyled = styled.div`
-  width: 60px;
-  height: 60px;
-  border: 1px solid #897f7f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: bold;
-  margin-bottom: 10px;
+  .block-picker > div:first-child {
+    display: none;
+  }
+
+  .color-select {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    border: 5px solid #ac9898;
+  }
+  .color-select:hover {
+    cursor: pointer;
+  }
 `;
 
 export const SelectMenuStyled = styled.div`

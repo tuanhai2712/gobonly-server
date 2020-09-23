@@ -4,7 +4,7 @@ import { ActionTypes } from "@actions";
 
 export const categoryStateDefault = {
   categories: {},
-  temps: {}
+  templates: {}
 };
 
 export default {
@@ -17,7 +17,7 @@ export default {
       },
       [ActionTypes.GET_CATEGORY_TEMP_SUCCESS]: (state, action) => {
         return immutable(state, {
-          temps: { $set: action.payload }
+          templates: { $set: action.payload }
         });
       }
     },

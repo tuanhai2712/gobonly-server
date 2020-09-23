@@ -5,12 +5,16 @@ import { postJWT, getJWT } from "@services/Api";
 export function* createNewCategory({ payload }) {
   try {
     let formData = new FormData();
-    formData.append("template", payload.template);
     formData.append("name", payload.name);
-    formData.append("color_code", payload.color_code);
     formData.append("description", payload.description);
     formData.append("gender", payload.gender);
     formData.append("menu_id", payload.menu_id);
+    formData.append("apply_size", JSON.stringify(payload.apply_size));
+    payload.templates.map((template, idx) => {
+      Object.keys(template).forEach(key => {
+        formData.append(`templates[${idx}][${key}]`, template[key]);
+      });
+    });
     yield postJWT("/create-category", formData);
     yield put({
       type: ActionTypes.CREATE_NEW_CATEGORY_SUCCESS

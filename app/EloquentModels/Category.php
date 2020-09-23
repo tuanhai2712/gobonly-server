@@ -14,11 +14,13 @@ class Category extends Model
         return $this->belongsToMany(Size::class, 'category_size');
     }
 
-    public function template(){
+    public function template()
+    {
         return $this->hasMany(Template::class);
     }
 
-    public function menu(){
+    public function menu()
+    {
         return $this->belongsTo(Menu::class, 'menu_id');
     }
 }

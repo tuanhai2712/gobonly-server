@@ -21,14 +21,19 @@ class CategoryService implements CategoryServiceInterface
           'message' => 'Category has exist',
         ], 422);
       }
+      $applySize = false;
+      if (intval($data['apply_size'])) {
+        $applySize = true;
+      }
       $newCategory = new Category;
       $newCategory->name = $data['name'];
       $newCategory->description = $data['description'];
       $newCategory->gender = $data['gender'];
       $newCategory->menu_id = $data['menu_id'];
+      $newCategory->apply_size = $applySize;
       $newCategory->save();
       if ($newCategory->id) {
-        $this->saveTemplate($data['template'], $newCategory->id, $data['color_code']);
+        $this->saveTemplate($data['templates'], $newCategory->id);
         $this->saveSizeCategory($newCategory->id);
       }
       return response()->json([
@@ -49,15 +54,22 @@ class CategoryService implements CategoryServiceInterface
       CategorySize::insert($data);
     }
   
-    private function saveTemplate($file, $categoryId, $color)
+    private function saveTemplate($templates, $categoryId)
     {
-        $file = Storage::disk('public')->put('', $file);
-        $url = Storage::url($file);
-        $newTemplate = new Template;
-        $newTemplate->url = $url;
-        $newTemplate->color = $color;
-        $newTemplate->category_id = $categoryId;
-        $newTemplate->save();
+      foreach ($templates as $key => $template) {
+        if ($template['color_code'] && $template['temp_front'] && $template['temp_back']) {
+          $tempFront = Storage::disk('public')->put('', $template['temp_front']);
+          $tempBack = Storage::disk('public')->put('', $template['temp_back']);
+          $tempFrontUrl = Storage::url($tempFront);
+          $tempBackUrl = Storage::url($tempBack);
+          $newTemplate = new Template;
+          $newTemplate->front = $tempFrontUrl;
+          $newTemplate->back = $tempBackUrl;
+          $newTemplate->color = $template['color_code'];
+          $newTemplate->category_id = $categoryId;
+          $newTemplate->save();
+        }
+      }
     }
 
     public function get($conditions)

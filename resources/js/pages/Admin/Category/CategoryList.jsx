@@ -142,7 +142,7 @@ export default function CategoryList() {
                     <div className="img-container">
                       <img
                         alt="..."
-                        src={process.env.MIX_APP_URL + item.template[0].url}
+                        src={process.env.MIX_APP_URL + item.template[0].front}
                         className="img-template"
                       />
                     </div>

@@ -14,7 +14,7 @@ import Card from "@components/Card/Card.jsx";
 import Button from "@components/CustomButton/CustomButton.jsx";
 import Success from "@components/Alert/Success.jsx";
 import ImageUploader from "react-images-upload";
-import { SketchPicker } from "react-color";
+import { SketchPicker, BlockPicker } from "react-color";
 import {
   ColorCodeStyled,
   CreateCategoryStyled,
@@ -25,6 +25,9 @@ import Select from "react-select";
 import { Formik } from "formik";
 import * as yup from "yup";
 import CreateMenuModal from "./CreateMenuModal";
+import AddTemplate from "./AddTemplate";
+import Checkbox from "@components/CustomCheckbox/CustomCheckbox.jsx";
+
 const schema = yup.object({
   name: yup.string().required("Please enter category name"),
   description: yup
@@ -34,16 +37,22 @@ const schema = yup.object({
 });
 
 export default function CreateCategory() {
-  const [state, setState] = useState({
-    template: null,
-    color_code: ""
-  });
-  const [menuSelected, setMenuSelected] = useState(null);
-  const [genderSelected, setGenderSelected] = useState(null);
   const [show, setShow] = useState(false);
   const fetching = useSelector(state => state.fetching);
   const { items } = useSelector(state => state.menu);
   const { type, status } = fetching;
+  const [templates, setTemplates] = useState([
+    {
+      temp_front: null,
+      temp_back: null,
+      color_code: ""
+    }
+  ]);
+  const [state, setState] = useState({
+    menuSelected: null,
+    genderSelected: null,
+    apply_size: 0
+  });
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -51,25 +60,16 @@ export default function CreateCategory() {
       type: ActionTypes.GET_MENU_REQUEST
     });
   }, []);
-  const onDrop = file => {
-    setState({ ...state, ["template"]: file.length ? file[0] : null });
-  };
-
-  const changeColor = color => {
-    setState({ ...state, ["color_code"]: color.hex });
-  };
 
   const create = (values, { setSubmitting }) => {
-    if (!state.template || !state.color_code || !menuSelected) {
-      return;
-    }
     dispatch({
       type: ActionTypes.CREATE_NEW_CATEGORY_REQUEST,
       payload: {
         ...values,
-        ...state,
-        menu_id: menuSelected.value,
-        gender: genderSelected.label
+        gender: state.genderSelected.label,
+        menu_id: state.menuSelected.value,
+        apply_size: state.apply_size,
+        templates
       }
     });
     setSubmitting(false);
@@ -90,11 +90,26 @@ export default function CreateCategory() {
       <Select
         className="react-select primary"
         classNamePrefix="react-select"
-        value={menuSelected}
-        onChange={value => setMenuSelected(value)}
+        value={state.menuSelected}
+        onChange={value => setState({ ...state, ["menuSelected"]: value })}
         options={selectItems}
       />
     );
+  };
+
+  const addTemplate = () => {
+    setTemplates([
+      ...templates,
+      {
+        temp_front: null,
+        temp_back: null,
+        color_code: ""
+      }
+    ]);
+  };
+
+  const applySize = () => {
+    setState({ ...state, ["apply_size"]: state.apply_size ? 0 : 1 });
   };
   return (
     <div className="main-content">
@@ -115,7 +130,8 @@ export default function CreateCategory() {
                     initialValues={{
                       name: "",
                       description: "",
-                      menu_id: null
+                      menu_id: null,
+                      apply_size: false
                     }}
                     onSubmit={create}
                   >
@@ -151,13 +167,20 @@ export default function CreateCategory() {
                                 <i className="pe-7s-plus"></i>
                               </Button>
                             </SelectMenuStyled>
-                            {!menuSelected && (
+                            {!state.menuSelected && (
                               <small className="text-danger">
                                 Please select menu first
                               </small>
                             )}
                           </FormGroup>
-
+                          <FormGroup>
+                            <Checkbox
+                              isChecked={state.apply_size}
+                              onClick={() => applySize()}
+                              number="1"
+                              label="Apply Size"
+                            />
+                          </FormGroup>
                           <FormGroup>
                             <ControlLabel>
                               Category Name: <span className="star">*</span>
@@ -181,8 +204,13 @@ export default function CreateCategory() {
                             <Select
                               className="react-select primary"
                               classNamePrefix="react-select"
-                              value={genderSelected}
-                              onChange={value => setGenderSelected(value)}
+                              value={state.genderSelected}
+                              onChange={value =>
+                                setState({
+                                  ...state,
+                                  ["genderSelected"]: value
+                                })
+                              }
                               options={[
                                 {
                                   value: 0,
@@ -242,37 +270,22 @@ export default function CreateCategory() {
               />
             </Col>
             <Col md={6}>
-              <ImageUploader
-                withIcon={true}
-                buttonText="Select template"
-                label={"Template for category"}
-                onChange={onDrop}
-                singleImage={true}
-                imgExtension={[".png"]}
-                withPreview={true}
-              />
-              {!state.template && (
-                <small className="text-danger">
-                  Please upload template for category
-                </small>
-              )}
-              <FormGroup controlId="formControlsTextarea">
-                <ControlLabel>
-                  Color Code: <span className="star">*</span>
-                </ControlLabel>
-                <ColorCodeStyled style={{ backgroundColor: state.color_code }}>
-                  {state.color_code}
-                </ColorCodeStyled>
-                {!state.color_code && (
-                  <small className="text-danger">
-                    Please select color code
-                  </small>
-                )}
-                <SketchPicker
-                  color={state.color_code}
-                  onChangeComplete={color => changeColor(color)}
-                />
-              </FormGroup>
+              <Button className="btn-add-temp" onClick={() => addTemplate()}>
+                Add
+              </Button>
+              <div>
+                {templates.map((template, idx) => {
+                  return (
+                    <Col md={4} key={idx}>
+                      <AddTemplate
+                        index={idx}
+                        templates={templates}
+                        setTemplates={setTemplates}
+                      />
+                    </Col>
+                  );
+                })}
+              </div>
             </Col>
           </Row>
         </Grid>

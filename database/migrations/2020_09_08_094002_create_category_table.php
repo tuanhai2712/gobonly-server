@@ -19,6 +19,7 @@ class CreateCategoryTable extends Migration
             $table->integer('menu_id');
             $table->string('gender')->default('male');
             $table->longText('description');
+            $table->boolean('apply_size')->default(false);
             $table->timestamps();
         });
     }

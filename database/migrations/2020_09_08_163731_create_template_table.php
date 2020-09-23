@@ -15,7 +15,8 @@ class CreateTemplateTable extends Migration
     {
         Schema::create('template', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('url');
+            $table->string('front');
+            $table->string('back');
             $table->string('color');
             $table->unsignedInteger('category_id');
             $table->foreign('category_id')->references('id')->on('category')

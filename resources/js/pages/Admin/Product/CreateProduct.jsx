@@ -12,11 +12,12 @@ import Draggable from "react-draggable";
 import "react-rangeslider/lib/index.css";
 import Slider from "react-rangeslider";
 import htmlToImage from "html-to-image";
+import SelectTemplateModal from "./SelectTemplateModal";
 
 export default function CreateProduct() {
   const dispatch = useDispatch();
   const imgRef = useRef();
-  const { temps } = useSelector(state => state.categories);
+  const { templates } = useSelector(state => state.categories);
   const { type, status } = useSelector(state => state.fetching);
   const [categorySelected, setCategorySelected] = useState(null);
   const [template, setTemplate] = useState([]);
@@ -39,7 +40,7 @@ export default function CreateProduct() {
 
   const handleCategorySelect = category => {
     setCategorySelected(category);
-    temps.data.find(item => {
+    templates.data.find(item => {
       if (item.id === category.value) {
         setTemplate(item.template);
       }
@@ -49,7 +50,7 @@ export default function CreateProduct() {
   const renderCategories = () => {
     if (
       (type === ActionTypes.GET_CATEGORY_TEMP_REQUEST && status) ||
-      isEmpty(temps)
+      isEmpty(templates)
     ) {
       return (
         <div style={{ textAlign: "center" }}>
@@ -64,7 +65,7 @@ export default function CreateProduct() {
         isDisabled: true
       }
     ];
-    temps.data.map((item, idx) => {
+    templates.data.map((item, idx) => {
       selectItems.push({ value: item.id, label: item.name });
     });
     return (
@@ -127,9 +128,25 @@ export default function CreateProduct() {
     <div className="main-content">
       <CreateProductStyled>
         <Grid fluid>
-          <Col md={6}>
-            <div>
-              {!isEmpty(temps) && (
+          <Col md={3}>
+            <h3>Design your products</h3>
+            <div className="product-section-select">
+              <i className="pe-7s-close" onClick={() => console.log("xxx")} />
+              <img
+                style={{ width: 50 }}
+                src={
+                  process.env.MIX_APP_URL +
+                  "/storage/l7p1Qus1mHRigmdIh0Egnz9aBEONPyKb4nqBVVlj.png"
+                }
+              />
+              <div className="category-info">
+                <span className="category-name">Tshirt</span>
+                <div className="color-item"></div>
+              </div>
+            </div>
+            <SelectTemplateModal />
+            {/* <div>
+              {!isEmpty(templates) && (
                 <>
                   {renderCategories()}
                   {renderColor()}
@@ -191,9 +208,9 @@ export default function CreateProduct() {
                   </div>
                 </div>
               </>
-            )}
+            )} */}
           </Col>
-          <Col md={6}>
+          <Col md={9}>
             <LogoUpload
               getPictureFiles={logo => getLogo(logo)}
               pictureFiles={state.logo}
