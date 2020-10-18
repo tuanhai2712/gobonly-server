@@ -10,6 +10,7 @@ use App\EloquentModels\CategorySize;
 use App\EloquentModels\Size;
 use App\EloquentModels\Menu;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class CategoryService implements CategoryServiceInterface
 {
@@ -91,9 +92,14 @@ class CategoryService implements CategoryServiceInterface
 
     public function getTemp()
     {
-      $categoryTemp = Category::with('template')->get()->toArray();
+      $menu = Menu::get()->toArray();
+      foreach ($menu as $key => $value) {
+        $templateData = Category::where('menu_id', $value['id'])->with('template')->get()->toArray();
+        $menu[$key]['category'] = $templateData;
+      }
+
       return response()->json([
-        'data' => $categoryTemp,
+        'data' => $menu,
       ], 200);
     }
 }

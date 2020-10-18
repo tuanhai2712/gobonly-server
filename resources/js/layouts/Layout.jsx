@@ -6,7 +6,6 @@ import { postJWT } from "../services/Api";
 export default function Layout(props) {
   useEffect(() => {
     // if (localStorage.getItem("token")) {
-    //   alert("token expired");
     //   getJWT("/auth/user-profile")
     //     .then(result => {
     //       if (result.status !== 200) {
@@ -15,10 +14,15 @@ export default function Layout(props) {
     //       }
     //     })
     //     .catch(() => {
+    //       alert("token expired");
     //       localStorage.clear();
     //       window.location.href = "/login";
     //     });
-    // } else window.location.href = "/login";
+    // } else {
+    //   alert("token expired");
+    //   window.location.href = "/login"
+      
+    // };
     // /** Check every 25 minutes to refresh the token once */
     // const timer = setInterval(() => {
     //   postJWT("/auth/refresh")
@@ -32,8 +36,8 @@ export default function Layout(props) {
     //       localStorage.clear();
     //       window.location.href = "/login";
     //     });
-    // }, 180000);
-    /** exit component then clear interval */
+    // }, 3600);
+    // /** exit component then clear interval */
     // return () => {
     //   clearInterval(timer);
     // };

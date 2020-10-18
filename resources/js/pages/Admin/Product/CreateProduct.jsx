@@ -1,221 +1,278 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Grid, Col } from "react-bootstrap";
-import LogoUpload from "./LogoUpload";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionTypes } from "@actions";
-import Select from "react-select";
-import Loader from "react-loader-spinner";
-import { isEmpty } from "lodash";
 import Button from "@components/CustomButton/CustomButton.jsx";
 import { CreateProductStyled } from "./style";
-import Draggable from "react-draggable";
 import "react-rangeslider/lib/index.css";
 import Slider from "react-rangeslider";
 import htmlToImage from "html-to-image";
 import SelectTemplateModal from "./SelectTemplateModal";
+import CustomProduct from "./CustomProduct";
 
 export default function CreateProduct() {
   const dispatch = useDispatch();
   const imgRef = useRef();
-  const { templates } = useSelector(state => state.categories);
-  const { type, status } = useSelector(state => state.fetching);
-  const [categorySelected, setCategorySelected] = useState(null);
-  const [template, setTemplate] = useState([]);
-  const [image, setImg] = useState(null);
+  const refTemplateFront = useRef();
+  const refTemplateBack = useRef();
+  const editTabRef = useRef();
+  const fileInputFront = useRef();
+  const fileInputBack = useRef();
+  const [templatesSelected, setTemplateSelected] = useState([]);
+  const [height, setHeight] = useState(0);
+  const [previewImgBack, setPreviewImgBack] = useState("");
+  const [previewImgFront, setPreviewImgFront] = useState("");
   const [state, setState] = useState({
-    url: "",
-    logo: [],
-    width: 125,
-    height: 125
+    front_logo_size: 125,
+    back_logo_size: 125,
+    idx: 0,
+    logo_front: "",
+    logo_back: "",
+    tab: "custom"
   });
   useEffect(() => {
+    console.log("xxx");
     dispatch({
       type: ActionTypes.GET_CATEGORY_TEMP_REQUEST
     });
-  }, []);
-
-  const getLogo = logo => {
-    setState({ ...state, ["logo"]: logo });
-  };
-
-  const handleCategorySelect = category => {
-    setCategorySelected(category);
-    templates.data.find(item => {
-      if (item.id === category.value) {
-        setTemplate(item.template);
-      }
-    });
-  };
-
-  const renderCategories = () => {
-    if (
-      (type === ActionTypes.GET_CATEGORY_TEMP_REQUEST && status) ||
-      isEmpty(templates)
-    ) {
-      return (
-        <div style={{ textAlign: "center" }}>
-          <Loader type="Circles" color="#36d7b7" height={25} width={25} />;
-        </div>
-      );
-    }
-    let selectItems = [
-      {
-        value: 0,
-        label: "Menu Option",
-        isDisabled: true
-      }
-    ];
-    templates.data.map((item, idx) => {
-      selectItems.push({ value: item.id, label: item.name });
-    });
-    return (
-      <Select
-        className="react-select primary"
-        classNamePrefix="react-select"
-        value={categorySelected}
-        onChange={value => handleCategorySelect(value)}
-        options={selectItems}
-      />
-    );
-  };
-
-  const selectColor = color => {
-    template.find((t, idx) => {
-      if (t.color === color) {
-        setState({ ...state, ["url"]: t.url });
-      }
-    });
-  };
-
-  const renderColor = () => {
-    return template.map((t, idx) => {
-      return (
-        <Button
-          key={idx}
-          className="cl-btn"
-          style={{ backgroundColor: `${t.color}` }}
-          onClick={() => selectColor(t.color)}
-          key={idx}
-        ></Button>
-      );
-    });
-  };
-
-  const selectLogo = index => {
+    setHeight(Math.floor(editTabRef.current.offsetWidth / 2));
     setState({
       ...state,
-      ["logoSelected"]: URL.createObjectURL(state.logo[index])
+      ["front_logo_size"]: Math.floor(editTabRef.current.offsetWidth / 6),
+      ["back_logo_size"]: Math.floor(editTabRef.current.offsetWidth / 6)
     });
+  }, []);
+
+  const triggerFileInputFront = () => {
+    fileInputFront.current.click();
   };
-  const handleChangeWithSlider = value => {
-    setState({ ...state, width: value });
-  };
-  const handleChangeHeightSlider = value => {
-    setState({ ...state, height: value });
+  const triggerFileInputBack = () => {
+    fileInputBack.current.click();
   };
 
-  const exportImage = () => {
+  const handleChangeInputFront = event => {
+    setState({
+      ...state,
+      ["logo_front"]: URL.createObjectURL(event.target.files[0])
+    });
+  };
+  const handleChangeInputBack = event => {
+    setState({
+      ...state,
+      ["logo_back"]: URL.createObjectURL(event.target.files[0])
+    });
+  };
+
+  const handleChangeFrontLogoSize = value => {
+    setState({ ...state, front_logo_size: value });
+  };
+  const handleChangeBackLogoSize = value => {
+    setState({ ...state, back_logo_size: value });
+  };
+
+  const exportImageFront = () => {
     htmlToImage
-      .toPng(imgRef.current)
+      .toPng(refTemplateFront.current)
       .then(function(dataUrl) {
-        setImg(dataUrl);
+        setPreviewImgBack(dataUrl);
       })
       .catch(function(error) {
         console.error("oops, something went wrong!", error);
       });
   };
+  const exportImageBack = () => {
+    htmlToImage
+      .toPng(refTemplateBack.current)
+      .then(function(dataUrl) {
+        setPreviewImgFront(dataUrl);
+      })
+      .catch(function(error) {
+        console.error("oops, something went wrong!", error);
+      });
+  };
+
+  const selectedTemplate = item => {
+    setTemplateSelected(prevArray => [...prevArray, item]);
+  };
+  const removeTemplateSelected = item => {
+    let newArr = templatesSelected;
+    newArr.splice(
+      newArr.findIndex(
+        i =>
+          i.category_name === item.category_name &&
+          i.category_id === item.category_id &&
+          i.color === item.color &&
+          item.front === i.front &&
+          item.back === i.back
+      ),
+      1
+    );
+    setTemplateSelected([...newArr]);
+  };
+  const selectTemplateToCustom = idx => {
+    setState({ ...state, ["idx"]: idx, ["url"]: "" });
+  };
+  const renderTemplateSelected = () => {
+    if (templatesSelected.length) {
+      return templatesSelected.map((item, idx) => {
+        return (
+          <div
+            className="product-section-select"
+            key={idx}
+            onClick={() => selectTemplateToCustom(idx)}
+          >
+            <i
+              className="pe-7s-close"
+              onClick={() => removeTemplateSelected(item)}
+            />
+            <img
+              style={{ width: 50 }}
+              src={process.env.MIX_APP_URL + item.front}
+            />
+            <div className="category-info">
+              <span className="category-name">{item.category_name}</span>
+              <div
+                className="color-item"
+                style={{ backgroundColor: `${item.color}` }}
+              ></div>
+            </div>
+          </div>
+        );
+      });
+    }
+    return null;
+  };
+  const selectTab = tab => {
+    setState({ ...state, tab });
+  };
+  const exportFile = () => {
+    exportImageFront();
+    exportImageBack();
+  };
   return (
     <div className="main-content">
       <CreateProductStyled>
         <Grid fluid>
-          <Col md={3}>
+          <Col md={4}>
             <h3>Design your products</h3>
-            <div className="product-section-select">
-              <i className="pe-7s-close" onClick={() => console.log("xxx")} />
-              <img
-                style={{ width: 50 }}
-                src={
-                  process.env.MIX_APP_URL +
-                  "/storage/l7p1Qus1mHRigmdIh0Egnz9aBEONPyKb4nqBVVlj.png"
-                }
-              />
-              <div className="category-info">
-                <span className="category-name">Tshirt</span>
-                <div className="color-item"></div>
-              </div>
-            </div>
-            <SelectTemplateModal />
-            {/* <div>
-              {!isEmpty(templates) && (
-                <>
-                  {renderCategories()}
-                  {renderColor()}
-                </>
-              )}
-            </div>
-
-            {state.url && (
+            {renderTemplateSelected()}
+            <SelectTemplateModal
+              dataSelected={templatesSelected}
+              updateTemplateSelected={item => selectedTemplate(item)}
+              removeTemplateSelected={item => removeTemplateSelected(item)}
+            />
+          </Col>
+          <Col md={8}>
+            <h3>Custom Product</h3>
+            {templatesSelected.length && state.tab === "custom" ? (
               <>
-                <div className="config-size-logo-container">
-                  <div style={{ flex: 1, marginRight: 10 }}>
-                    <label>Width</label>
-                    <Slider
-                      min={0}
-                      max={250}
-                      value={state.width}
-                      onChange={handleChangeWithSlider}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label>Height</label>
-                    <Slider
-                      min={0}
-                      max={250}
-                      value={state.height}
-                      onChange={handleChangeHeightSlider}
-                    />
-                  </div>
-                </div>
-                <Button onClick={() => exportImage()}>Export</Button>
+                <Button onClick={() => exportFile()}>Export</Button>
                 <div style={{ display: "flex" }}>
-                  <div
-                    ref={imgRef}
-                    className="bg-temp-container"
-                    style={{
-                      background:
-                        "url(" + process.env.MIX_APP_URL + state.url + ")"
-                    }}
-                  >
-                    <Draggable bounds="parent">
-                      <div
-                        style={{
-                          cursor: "grab",
-                          height: 250,
-                          width: 250,
-                          display: "flex",
-                          flexWrap: "wrap"
-                        }}
-                      >
-                        <img
-                          src={state.logoSelected}
-                          style={{ width: state.width, height: state.height }}
-                        />
-                      </div>
-                    </Draggable>
+                  <div className="btn-upload-logo">
+                    <label>Front Logo</label>
+                    <Button
+                      onClick={() => triggerFileInputFront()}
+                      style={{
+                        backgroundImage: `url(${state.logo_front})`,
+                        backgroundSize: "cover",
+                        width: "75px",
+                        height: "75px"
+                      }}
+                    >
+                      <i className="pe-7s-plus"></i>
+                      <input
+                        ref={fileInputFront}
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={handleChangeInputFront}
+                      ></input>
+                    </Button>
+                    <Slider
+                      min={0}
+                      max={300}
+                      value={state.front_logo_size}
+                      onChange={handleChangeFrontLogoSize}
+                    />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <img src={image} />
+                  <div className="btn-upload-logo">
+                    <label>Back Logo</label>
+                    <Button
+                      onClick={() => triggerFileInputBack()}
+                      style={{
+                        backgroundImage: `url(${state.logo_back})`,
+                        backgroundSize: "cover",
+                        width: "75px",
+                        height: "75px"
+                      }}
+                    >
+                      <i className="pe-7s-plus"></i>
+                      <input
+                        ref={fileInputBack}
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={handleChangeInputBack}
+                      ></input>
+                    </Button>
+                    <Slider
+                      min={0}
+                      max={300}
+                      value={state.back_logo_size}
+                      onChange={handleChangeBackLogoSize}
+                    />
                   </div>
                 </div>
               </>
-            )} */}
-          </Col>
-          <Col md={9}>
-            <LogoUpload
-              getPictureFiles={logo => getLogo(logo)}
-              pictureFiles={state.logo}
-              selectLogo={index => selectLogo(index)}
-            />
+            ) : null}
+            <div className="custom-product-container">
+              <div className="custom-tab">
+                <div
+                  className={`edit-tab ${state.tab === "custom" &&
+                    "tab-active"}`}
+                  onClick={() => selectTab("custom")}
+                >
+                  <span>Custom</span>
+                </div>
+                <div
+                  className={`preview-tab ${state.tab === "preview" &&
+                    "tab-active"}`}
+                  onClick={() => selectTab("preview")}
+                >
+                  <span>Preview</span>
+                </div>
+              </div>
+              {state.tab === "custom" ? (
+                <div
+                  className="edit-container"
+                  ref={editTabRef}
+                  style={{ height }}
+                >
+                  {templatesSelected.length ? (
+                    <CustomProduct
+                      templatesSelected={templatesSelected}
+                      height={height}
+                      front_logo_size={state.front_logo_size}
+                      back_logo_size={state.back_logo_size}
+                      idx={state.idx}
+                      logo_back={state.logo_back}
+                      logo_front={state.logo_front}
+                      refTemplateFront={refTemplateFront}
+                      refTemplateBack={refTemplateBack}
+                    />
+                  ) : (
+                    <span>Please Select Template To Custom First</span>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="edit-container"
+                  ref={editTabRef}
+                  style={{ height }}
+                >
+                  <img src={previewImgBack} />
+                  <img src={previewImgFront} />
+                </div>
+              )}
+            </div>
           </Col>
         </Grid>
       </CreateProductStyled>

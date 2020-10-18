@@ -6,6 +6,10 @@ export const CreateProductStyled = styled.div`
     border: 1px solid #fc6514;
     padding: 7px 14px;
     position: relative;
+    margin-bottom: 10px;
+    :hover {
+      cursor: pointer;
+    }
     > i {
       position: absolute;
       right: 1rem;
@@ -38,7 +42,6 @@ export const CreateProductStyled = styled.div`
   .btn-add-category {
     width: 100%;
     border: 1px solid #fc6514;
-    margin-top: 15px;
     > i {
       font-size: 30px;
       color: #fc6514;
@@ -51,10 +54,11 @@ export const CreateProductStyled = styled.div`
     margin-top: 20px;
     margin-bottom: 20px;
   }
-
+  .edit-container {
+    display: flex;
+    justify-content: center;
+  }
   .bg-temp-container {
-    flex: 1;
-    height: 500px;
     position: relative;
     background-size: cover !important;
     display: flex;
@@ -72,6 +76,55 @@ export const CreateProductStyled = styled.div`
   }
   .config-size-logo-container {
     display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+  }
+
+  .custom-product-container {
+    border: 1px solid #fc6514;
+    margin-top: 10px;
+  }
+  .custom-tab {
+    display: flex;
+    border-bottom: 1px solid #fc6514;
+    .edit-tab {
+      flex: 1;
+      padding: 5px;
+      text-align: center;
+      border-right: 1px solid #fc6514;
+      :hover {
+        cursor: pointer;
+      }
+    }
+    .preview-tab {
+      flex: 1;
+      padding: 5px;
+      text-align: center;
+      :hover {
+        cursor: pointer;
+      }
+    }
+    .tab-active {
+      background-color: #fc6514;
+      color: #fff;
+    }
+  }
+  .img-temp {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    > img {
+      width: 100px;
+      :hover {
+        cursor: pointer;
+      }
+    }
+  }
+  .btn-upload-logo {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
   }
 `;
 
@@ -107,29 +160,14 @@ export const SelectTemplateModalStyled = styled.div`
   .body-modal {
     margin-top: 20px;
   }
-  .category-item {
+  .select-template-type-container {
     display: flex;
-    padding: 0px;
-    > li {
-      list-style: none;
-      padding: 5px 10px;
-      :hover {
-        cursor: pointer;
-      }
+    justify-content: center;
+    margin-bottom: 20px;
+    .react-select {
+      width: 200px;
+      margin-right: 10px;
     }
-  }
-
-  .category-active {
-    border-color: #fc6514;
-    color: rgba(0, 0, 0, 0.95);
-    border-bottom-style: solid;
-    border-radius: 0;
-    align-self: flex-end;
-    margin: 0 0 -2px;
-    border-bottom-width: 2px;
-    transition: color 0.1s ease;
-    font-size: 15px;
-    font-weight: bold;
   }
 
   .template-list {
@@ -138,15 +176,11 @@ export const SelectTemplateModalStyled = styled.div`
   }
 
   .template-group {
-    width: 20%;
-    height: 250px;
     padding: 5px;
-    float: left;
-
     .template-item {
       background-size: cover;
       width: 100%;
-      height: 100%;
+      height: 250px;
       border: 1px solid #bfacac;
       position: relative;
       :hover {

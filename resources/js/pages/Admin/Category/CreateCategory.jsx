@@ -38,9 +38,8 @@ const schema = yup.object({
 
 export default function CreateCategory() {
   const [show, setShow] = useState(false);
-  const fetching = useSelector(state => state.fetching);
+  const { type, status } = useSelector(state => state.fetching);
   const { items } = useSelector(state => state.menu);
-  const { type, status } = fetching;
   const [templates, setTemplates] = useState([
     {
       temp_front: null,
