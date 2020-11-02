@@ -9,10 +9,29 @@ import Slider from "react-rangeslider";
 import htmlToImage from "html-to-image";
 import SelectTemplateModal from "./SelectTemplateModal";
 import CustomProduct from "./CustomProduct";
+import localStorage from "redux-persist/es/storage";
+
+const test = [
+  {
+    back: "/storage/DcT1xJtptvRZvT1vCyUNAg0QEjJKgU4oMrxB1YbK.png",
+    category_id: 1,
+    category_name: "T-Shirt",
+    color: "#697689",
+    front: "/storage/e63z7VN1OkiiL76uVrtuvROpGyOzQP8kyUaDoN4e.png",
+    id: 1
+  },
+  {
+    back: "/storage/Z6jEeWYcbDXgkYXHfxoYGXwAaywF1EpXBNiqIjh4.png",
+    category_id: 1,
+    category_name: "T-Shirt",
+    color: "#2ccce4",
+    front: "/storage/1KHjGzv9sV6fYJzgFIZgoHtETgjPmklT9lEWSUdL.png",
+    id: 2
+  }
+];
 
 export default function CreateProduct() {
   const dispatch = useDispatch();
-  const imgRef = useRef();
   const refTemplateFront = useRef();
   const refTemplateBack = useRef();
   const editTabRef = useRef();
@@ -20,18 +39,16 @@ export default function CreateProduct() {
   const fileInputBack = useRef();
   const [templatesSelected, setTemplateSelected] = useState([]);
   const [height, setHeight] = useState(0);
-  const [previewImgBack, setPreviewImgBack] = useState("");
-  const [previewImgFront, setPreviewImgFront] = useState("");
+
   const [state, setState] = useState({
     front_logo_size: 125,
     back_logo_size: 125,
     idx: 0,
     logo_front: "",
-    logo_back: "",
-    tab: "custom"
+    logo_back: ""
   });
+  const [abc, setAbc] = useState([]);
   useEffect(() => {
-    console.log("xxx");
     dispatch({
       type: ActionTypes.GET_CATEGORY_TEMP_REQUEST
     });
@@ -68,27 +85,6 @@ export default function CreateProduct() {
   };
   const handleChangeBackLogoSize = value => {
     setState({ ...state, back_logo_size: value });
-  };
-
-  const exportImageFront = () => {
-    htmlToImage
-      .toPng(refTemplateFront.current)
-      .then(function(dataUrl) {
-        setPreviewImgBack(dataUrl);
-      })
-      .catch(function(error) {
-        console.error("oops, something went wrong!", error);
-      });
-  };
-  const exportImageBack = () => {
-    htmlToImage
-      .toPng(refTemplateBack.current)
-      .then(function(dataUrl) {
-        setPreviewImgFront(dataUrl);
-      })
-      .catch(function(error) {
-        console.error("oops, something went wrong!", error);
-      });
   };
 
   const selectedTemplate = item => {
@@ -142,12 +138,72 @@ export default function CreateProduct() {
     }
     return null;
   };
-  const selectTab = tab => {
-    setState({ ...state, tab });
-  };
-  const exportFile = () => {
-    exportImageFront();
-    exportImageBack();
+
+  async function exportFile() {
+    test.map((item, idx) => {
+      refTemplateFront.current.style.background =
+        "url(" +
+        process.env.MIX_APP_URL +
+        item.front +
+        ") no-repeat center center";
+      htmlToImage
+        .toPng(refTemplateFront.current)
+        .then(function(dataUrl) {
+          console.log(idx);
+          console.log(dataUrl);
+          console.log(refTemplateFront.current);
+        })
+        .catch(function(error) {
+          console.error("oops, something went wrong!", error);
+        });
+      // if (item.id === 1) {
+      //   refTemplateFront.current.style.background =
+      //     "url(" +
+      //     process.env.MIX_APP_URL +
+      //     item.front +
+      //     ") no-repeat center center";
+      //     console.log(refTemplateFront.current)
+      //   // exportImageFront();
+      // }
+      // if (item.id === 2) {
+      //   refTemplateFront.current.style.background =
+      //     "url(" +
+      //     process.env.MIX_APP_URL +
+      //     item.front +
+      //     ") no-repeat center center";
+      //   exportImageFront();
+      // }
+    });
+
+    // test.map((item, idx) => {
+    //   refTemplateFront.current.style.background =
+    //     "url(" +
+    //     process.env.MIX_APP_URL +
+    //     item.front +
+    //     ") no-repeat center center";
+    //   // exportImageFront(refTemplateFront.current);
+    // });
+  }
+
+  async function exportImageFront() {
+    const url = await htmlToImage.toPng(refTemplateFront.current);
+    setAbc(prevArray => [...prevArray, { front: url }]);
+  }
+  const exportImageBack = id => {
+    htmlToImage
+      .toPng(refTemplateBack.current)
+      .then(function(dataUrl) {
+        localStorage.setItem(
+          "products",
+          JSON.stringify({
+            back: dataUrl,
+            id: id
+          })
+        );
+      })
+      .catch(function(error) {
+        console.error("oops, something went wrong!", error);
+      });
   };
   return (
     <div className="main-content">
@@ -164,7 +220,15 @@ export default function CreateProduct() {
           </Col>
           <Col md={8}>
             <h3>Custom Product</h3>
-            {templatesSelected.length && state.tab === "custom" ? (
+            {abc.length &&
+              abc.map(i => {
+                return (
+                  <>
+                    <img src={i.front} style={{ width: "50px" }}></img>
+                  </>
+                );
+              })}
+            {test.length ? (
               <>
                 <Button onClick={() => exportFile()}>Export</Button>
                 <div style={{ display: "flex" }}>
@@ -224,54 +288,27 @@ export default function CreateProduct() {
               </>
             ) : null}
             <div className="custom-product-container">
-              <div className="custom-tab">
-                <div
-                  className={`edit-tab ${state.tab === "custom" &&
-                    "tab-active"}`}
-                  onClick={() => selectTab("custom")}
-                >
-                  <span>Custom</span>
-                </div>
-                <div
-                  className={`preview-tab ${state.tab === "preview" &&
-                    "tab-active"}`}
-                  onClick={() => selectTab("preview")}
-                >
-                  <span>Preview</span>
-                </div>
+              <div
+                className="edit-container"
+                ref={editTabRef}
+                style={{ height }}
+              >
+                {test.length ? (
+                  <CustomProduct
+                    templatesSelected={test}
+                    height={height}
+                    front_logo_size={state.front_logo_size}
+                    back_logo_size={state.back_logo_size}
+                    idx={state.idx}
+                    logo_back={state.logo_back}
+                    logo_front={state.logo_front}
+                    refTemplateFront={refTemplateFront}
+                    refTemplateBack={refTemplateBack}
+                  />
+                ) : (
+                  <span>Please Select Template To Custom First</span>
+                )}
               </div>
-              {state.tab === "custom" ? (
-                <div
-                  className="edit-container"
-                  ref={editTabRef}
-                  style={{ height }}
-                >
-                  {templatesSelected.length ? (
-                    <CustomProduct
-                      templatesSelected={templatesSelected}
-                      height={height}
-                      front_logo_size={state.front_logo_size}
-                      back_logo_size={state.back_logo_size}
-                      idx={state.idx}
-                      logo_back={state.logo_back}
-                      logo_front={state.logo_front}
-                      refTemplateFront={refTemplateFront}
-                      refTemplateBack={refTemplateBack}
-                    />
-                  ) : (
-                    <span>Please Select Template To Custom First</span>
-                  )}
-                </div>
-              ) : (
-                <div
-                  className="edit-container"
-                  ref={editTabRef}
-                  style={{ height }}
-                >
-                  <img src={previewImgBack} />
-                  <img src={previewImgFront} />
-                </div>
-              )}
             </div>
           </Col>
         </Grid>
