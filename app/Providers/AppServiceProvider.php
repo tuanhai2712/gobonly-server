@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Interfaces\CategoryServiceInterface;
-use App\Services\CategoryService;
-use App\Interfaces\MenuServiceInterface;
-use App\Services\MenuService;
+use App\Interfaces\CategoriesServiceInterface;
+use App\Services\CategoriesService;
+use App\Interfaces\StoreServiceInterface;
+use App\Services\StoreService;
+use App\Interfaces\StoreImagesServiceInterface;
+use App\Services\StoreImagesService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,12 +20,16 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(
-            CategoryServiceInterface::class,
-            CategoryService::class
+            CategoriesServiceInterface::class,
+            CategoriesService::class
         );
         $this->app->singleton(
-            MenuServiceInterface::class,
-            MenuService::class
+            StoreServiceInterface::class,
+            StoreService::class
+        );
+        $this->app->singleton(
+            StoreImagesServiceInterface::class,
+            StoreImagesService::class
         );
     }
 

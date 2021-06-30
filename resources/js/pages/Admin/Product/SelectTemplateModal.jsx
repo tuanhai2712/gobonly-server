@@ -145,8 +145,8 @@ export default function SelectTemplateModal(props) {
                   <div className="template-list">{renderTemplates()}</div>
                 </>
               ) : (
-                <span>Something wrong !</span>
-              )}
+                  <span>Something wrong !</span>
+                )}
           </div>
         </SelectTemplateModalStyled>
       </Modal>

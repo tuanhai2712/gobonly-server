@@ -5,6 +5,7 @@ import { post } from "@services/Api";
 export function* login({ payload }) {
   try {
     let response = yield post("/auth/login", payload);
+    console.log(response)
     yield put({
       type: ActionTypes.USER_LOGIN_SUCCESS,
       payload: response.data

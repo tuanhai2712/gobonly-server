@@ -15,7 +15,6 @@ class UserSeeder extends Seeder
         $data = [
             'email' => 'admin@gmail.com',
             'password' => bcrypt('12345678'),
-            'email_verified_at' => new Datetime(),
             'created_at' => new Datetime(),
           ];
           DB::table('users')->insert($data);

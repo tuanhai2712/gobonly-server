@@ -6,10 +6,12 @@ import Button from "@components/CustomButton/CustomButton.jsx";
 import { CreateProductStyled } from "./style";
 import "react-rangeslider/lib/index.css";
 import Slider from "react-rangeslider";
-import htmlToImage from "html-to-image";
+import * as htmlToImage from "html-to-image";
 import SelectTemplateModal from "./SelectTemplateModal";
 import CustomProduct from "./CustomProduct";
 import localStorage from "redux-persist/es/storage";
+import { reject } from "ramda";
+import { result } from "lodash";
 
 const test = [
   {
@@ -139,72 +141,40 @@ export default function CreateProduct() {
     return null;
   };
 
+  const apppendBackground = (item) => new Promise((resolve, reject) => {
+    refTemplateFront.current.style.background =
+      "url(" +
+      process.env.MIX_APP_URL +
+      item.front +
+      ") no-repeat center center";
+    resolve(refTemplateFront.current)
+  })
+
+  const exportPNG = async () => new Promise(async (resolve, reject) => {
+    const url = await htmlToImage.toPng(refTemplateFront.current)
+    if (url) {
+      resolve(url)
+    }
+  })
   async function exportFile() {
-    test.map((item, idx) => {
-      refTemplateFront.current.style.background =
-        "url(" +
-        process.env.MIX_APP_URL +
-        item.front +
-        ") no-repeat center center";
-      htmlToImage
-        .toPng(refTemplateFront.current)
-        .then(function(dataUrl) {
-          console.log(idx);
-          console.log(dataUrl);
-          console.log(refTemplateFront.current);
+    // const url = await htmlToImage.toPng(refTemplateFront.current)
+    // setAbc(prevArray => [...prevArray, { front: url }]);
+    for (let index = 1; index <= templatesSelected.length; index++) {
+      await exportPNG()
+        .then(result => {
+          setAbc(prevArray => [...prevArray, { front: result }]);
+          console.log(result)
+          if (result) {
+            refTemplateFront.current.style.background =
+              "url(" +
+              process.env.MIX_APP_URL +
+              templatesSelected[index].front +
+              ") no-repeat center center";
+          }
         })
-        .catch(function(error) {
-          console.error("oops, something went wrong!", error);
-        });
-      // if (item.id === 1) {
-      //   refTemplateFront.current.style.background =
-      //     "url(" +
-      //     process.env.MIX_APP_URL +
-      //     item.front +
-      //     ") no-repeat center center";
-      //     console.log(refTemplateFront.current)
-      //   // exportImageFront();
-      // }
-      // if (item.id === 2) {
-      //   refTemplateFront.current.style.background =
-      //     "url(" +
-      //     process.env.MIX_APP_URL +
-      //     item.front +
-      //     ") no-repeat center center";
-      //   exportImageFront();
-      // }
-    });
-
-    // test.map((item, idx) => {
-    //   refTemplateFront.current.style.background =
-    //     "url(" +
-    //     process.env.MIX_APP_URL +
-    //     item.front +
-    //     ") no-repeat center center";
-    //   // exportImageFront(refTemplateFront.current);
-    // });
+    }
   }
 
-  async function exportImageFront() {
-    const url = await htmlToImage.toPng(refTemplateFront.current);
-    setAbc(prevArray => [...prevArray, { front: url }]);
-  }
-  const exportImageBack = id => {
-    htmlToImage
-      .toPng(refTemplateBack.current)
-      .then(function(dataUrl) {
-        localStorage.setItem(
-          "products",
-          JSON.stringify({
-            back: dataUrl,
-            id: id
-          })
-        );
-      })
-      .catch(function(error) {
-        console.error("oops, something went wrong!", error);
-      });
-  };
   return (
     <div className="main-content">
       <CreateProductStyled>
@@ -223,12 +193,10 @@ export default function CreateProduct() {
             {abc.length &&
               abc.map(i => {
                 return (
-                  <>
-                    <img src={i.front} style={{ width: "50px" }}></img>
-                  </>
+                  <img src={i.front} style={{ width: "200px", height: "200px" }}></img>
                 );
               })}
-            {test.length ? (
+            {templatesSelected.length ? (
               <>
                 <Button onClick={() => exportFile()}>Export</Button>
                 <div style={{ display: "flex" }}>
@@ -293,9 +261,9 @@ export default function CreateProduct() {
                 ref={editTabRef}
                 style={{ height }}
               >
-                {test.length ? (
+                {templatesSelected.length ? (
                   <CustomProduct
-                    templatesSelected={test}
+                    templatesSelected={templatesSelected}
                     height={height}
                     front_logo_size={state.front_logo_size}
                     back_logo_size={state.back_logo_size}
@@ -306,8 +274,8 @@ export default function CreateProduct() {
                     refTemplateBack={refTemplateBack}
                   />
                 ) : (
-                  <span>Please Select Template To Custom First</span>
-                )}
+                    <span>Please Select Template To Custom First</span>
+                  )}
               </div>
             </div>
           </Col>

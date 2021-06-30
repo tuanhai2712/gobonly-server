@@ -10,13 +10,14 @@ Route::group(['middleware' => 'api'], function () {
         Route::post('logout', 'AuthController@logout');
         Route::post('refresh', 'AuthController@refresh');
         Route::get('user-profile', 'AuthController@userProfile');
+    });
+     Route::post('categories', 'CategoriesController@create');
+     Route::put('categories', 'CategoriesController@update');
+     Route::get('categories', 'CategoriesController@get');
+     Route::post('store', 'StoreController@create');
+     Route::get('store', 'StoreController@get');
+     Route::post('store-images', 'StoreImagesController@create');
+    // Route::group(['middleware' => 'auth'], function () {
 
-    });
-    Route::group(['middleware' => 'auth'], function () {
-        Route::post('create-category', 'CategoryController@create');
-        Route::post('create-menu', 'MenuController@create');
-        Route::get('menu-list', 'MenuController@get');
-        Route::post('category-list', 'CategoryController@get');
-        Route::get('get-category-temp', 'CategoryController@getTemp');
-    });
+    // });
 });
